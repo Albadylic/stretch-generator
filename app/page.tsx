@@ -20,7 +20,7 @@ export default function App() {
 
   const [state, setState] = useState({
     area: "back",
-    time: { rangeValue },
+    time: "20",
   });
 
   const handleAreaChange = ({
@@ -100,7 +100,7 @@ export default function App() {
         className="bg-sky-950	rounded p-4 text text-white font-semibold"
         onClick={async () => {
           const { output } = await generate(
-            `Generate a stretching plan focused on the ${state.area} that will take around ${state.time} minutes`
+            `Generate me a stretching plan focused on the ${state.area} that will take around ${state.time} minutes`
           );
           setGeneration(() => "");
           for await (const delta of readStreamableValue(output)) {
