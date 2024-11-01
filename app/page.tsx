@@ -9,6 +9,7 @@ export const preferredRegion = "home";
 
 export default function App() {
   const [generation, setGeneration] = useState<string>("");
+  const [rangeValue, setRangeValue] = useState<string>("20");
 
   const areas = [
     { value: "back" },
@@ -18,57 +19,85 @@ export default function App() {
   ];
 
   const [state, setState] = useState({
-    area: "",
-    time: "",
+    area: "back",
+    time: { rangeValue },
   });
 
-  const handleChange = ({
-    target: { name, value },
+  const handleAreaChange = ({
+    target,
   }: React.ChangeEvent<HTMLInputElement>) => {
     setState({
       ...state,
-      [name]: value,
+      [target.name]: target.value,
     });
+    target.checked = true;
+  };
+
+  const handleTimeChange = ({
+    target,
+  }: React.ChangeEvent<HTMLInputElement>) => {
+    setState({
+      ...state,
+      [target.name]: target.value,
+    });
+    target.checked = true;
+    setRangeValue(target.value);
   };
 
   return (
-    <main>
-      <div>
-        <h2>Daily stretch</h2>
+    <main className="flex flex-col items-center">
+      <h2 className="text-xl mt-4 mx-auto p-2">Daily stretch</h2>
+      <p className="mb-4 mx-auto">
+        Get a personalised stretching routine in seconds
+      </p>
+
+      <div className="bg-sky-700/75 rounded my-4 p-2">
+        <fieldset className="flex flex-col items-center my-2 p-2">
+          <legend className="font-semibold">
+            What would you like to stretch?
+          </legend>
+          {areas.map(({ value }, index) => (
+            <div key={value}>
+              <input
+                id={value}
+                type="radio"
+                value={value}
+                name="area"
+                onChange={handleAreaChange}
+                defaultChecked={index == 0 ? true : false}
+              />
+              <label htmlFor={value} className="pl-2">
+                {`${value.charAt(0).toUpperCase()}${value.substring(1)}`}
+              </label>
+            </div>
+          ))}
+        </fieldset>
       </div>
 
-      <div>
-        <h3>What would you like to stretch?</h3>
-        {areas.map(({ value }) => (
-          <div key={value}>
+      <div className="bg-sky-700/75 rounded my-4 p-2">
+        <fieldset className="flex flex-col items-center my-2 p-2 text-center">
+          <legend className="font-semibold">
+            How long would you like to stretch?
+          </legend>
+          <div>
             <input
-              id={value}
-              type="radio"
-              value={value}
-              name="area"
-              onChange={handleChange}
+              type="range"
+              id="time"
+              name="time"
+              min="10"
+              max="60"
+              step="5"
+              value={rangeValue}
+              onChange={handleTimeChange}
             />
-            <label htmlFor={value}>{`${value}`}</label>
+            <br />
+            <output id="rangeValue">{rangeValue} mins</output>
           </div>
-        ))}
-      </div>
-
-      <div>
-        <h3>How long would you like to stretch?</h3>
-        <div>
-          <input
-            type="range"
-            id="time"
-            name="time"
-            min="10"
-            max="60"
-            step="5"
-          />
-          <label htmlFor="time">Time (mins)</label>
-        </div>
+        </fieldset>
       </div>
 
       <button
+        className="bg-sky-950	rounded p-4 text text-white font-semibold"
         onClick={async () => {
           const { output } = await generate(
             `Generate a stretching plan focused on the ${state.area} that will take around ${state.time} minutes`
@@ -84,7 +113,9 @@ export default function App() {
         Generate Plan
       </button>
 
-      <div>{generation}</div>
+      <div className="overflow-auto w-9/12 whitespace-pre-wrap">
+        {generation}
+      </div>
     </main>
   );
 }
